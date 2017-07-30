@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import Question, Choice
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
 
 
@@ -19,8 +19,8 @@ def detail(request, question_id):
 
 
 def results(request, question_id):
-    response = 'You are looking at the results of question %s'
-    return HttpResponse(response % question_id)
+    question = get_object_or_404(Question, pk=question_id)
+    return render(request, 'polls/results.html', {'question': question})
 
 
 def vote(request, question_id):
@@ -36,4 +36,5 @@ def vote(request, question_id):
     else:
         selected_choice.votes += 1
         selected_choice.save()
-    return HttpResponseRedirect(reverse('polls:results', args=(p.id,)))
+        # 成功处理之后的post数据，总是返回一个HttpResponseRedirect，为了防止用户因点击了后退按钮而提交两次
+        return HttpResponseRedirect(reverse('polls:results', args=(p.id,)))
