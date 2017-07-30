@@ -3,6 +3,7 @@ from .models import Question, Choice
 from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
 from django.views import generic
+from django.utils import timezone
 
 
 class IndexView(generic.ListView):
@@ -10,8 +11,8 @@ class IndexView(generic.ListView):
     context_object_name = 'latest_question_list'
 
     def get_queryset(self):
-        """返回最后发布的五个问题"""
-        return Question.objects.order_by('-pub_date')[:5]
+        """返回最后发布的五个问题（不包括被设置在将来发布的）"""
+        return Question.objects.filter(pub_date__lte=timezone.now()).order_by('-pub_date')[:5]
 
 
 class DetailView(generic.DetailView):
